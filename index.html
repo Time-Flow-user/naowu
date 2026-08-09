@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>每天十分钟 · 去脑雾</title>
+<style>
+  :root{
+    --bg1:#eaf3fb; --bg2:#f3ecfb; --card:#ffffff; --ink:#27324a;
+    --sub:#6b7892; --line:#e7ecf3; --accent:#4a90d9; --accent2:#2bb3a3;
+    --good:#27ae60; --warn:#e67e22; --bad:#e74c3c; --shadow:0 8px 24px rgba(40,70,120,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2));min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px;}
+  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .date{font-size:12px;color:var(--sub);}
+  .hero{background:linear-gradient(135deg,#4a90d9,#2bb3a3);color:#fff;border-radius:20px;padding:20px;box-shadow:var(--shadow);}
+  .hero .tag{font-size:12px;opacity:.9;letter-spacing:1px;}
+  .hero h1{margin:6px 0 2px;font-size:21px;}
+  .hero .desc{font-size:13px;opacity:.92;line-height:1.5;}
+  .today-card{margin-top:16px;background:rgba(255,255,255,.16);border-radius:14px;padding:14px;backdrop-filter:blur(4px);}
+  .today-card .lbl{font-size:12px;opacity:.85;}
+  .today-card .name{font-size:20px;font-weight:800;margin:4px 0;}
+  .today-card .hint{font-size:12px;opacity:.9;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-weight:700;border-radius:12px;padding:13px 18px;font-size:16px;width:100%;transition:transform .08s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:#fff;color:var(--accent);}
+  .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+  .stats{display:flex;gap:10px;margin:16px 0;}
+  .stat{flex:1;background:var(--card);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow);}
+  .stat .n{font-size:22px;font-weight:800;color:var(--accent);}
+  .stat .t{font-size:11px;color:var(--sub);margin-top:2px;}
+  .sec-title{font-size:14px;font-weight:800;margin:20px 4px 10px;color:var(--ink);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .card{background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow);cursor:pointer;border:1px solid transparent;transition:transform .08s;}
+  .card:active{transform:scale(.98);}
+  .card .emoji{font-size:26px;}
+  .card .nm{font-weight:800;font-size:14px;margin:6px 0 2px;}
+  .card .best{font-size:11px;color:var(--sub);}
+  .card .pill{display:inline-block;font-size:10px;background:#eef4fb;color:var(--accent);border-radius:6px;padding:2px 6px;margin-top:6px;}
+  .card.done{opacity:.7;}
+  .card.done .nm::after{content:" ✓";color:var(--good);}
+  footer{margin-top:26px;text-align:center;font-size:11px;color:var(--sub);line-height:1.6;}
+  footer a{color:var(--accent);text-decoration:none;}
+  /* overlay */
+  .overlay{position:fixed;inset:0;background:#f5f8fc;z-index:50;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .28s ease;}
+  .overlay.show{transform:translateY(0);}
+  .ov-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;}
+  .ov-head .back{background:none;border:none;font-size:15px;color:var(--accent);font-weight:700;cursor:pointer;padding:4px 0;}
+  .ov-head .ttl{font-weight:800;font-size:15px;flex:1;}
+  .ov-head .timer{font-family:ui-monospace,SFMono-Regular,monospace;font-weight:900;color:#fff;font-size:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:6px 14px;border-radius:10px;box-shadow:0 4px 12px rgba(74,144,217,.25);letter-spacing:1px;}
+  .ov-body{flex:1;overflow:auto;padding:18px 16px 30px;}
+  /* intro */
+  .intro-card{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow);text-align:center;}
+  .intro-card .big-emoji{font-size:52px;}
+  .intro-card h2{margin:6px 0 12px;font-size:20px;}
+  .intro-card .section{text-align:left;margin:12px 0;font-size:13px;line-height:1.7;}
+  .intro-card .section b{display:block;margin-bottom:4px;}
+  .intro-card .helps{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .intro-card .helps span{background:#eef4fb;color:var(--accent);font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;}
+  .intro-card .evidence{font-size:11px;color:var(--sub);background:#f6f8fb;border-radius:8px;padding:8px;line-height:1.5;text-align:left;}
+  .level-select{margin:16px 0;}
+  .level-title{font-size:12px;color:var(--sub);margin-bottom:8px;}
+  .level-btns{display:flex;gap:8px;}
+  .level-btn{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;color:var(--sub);}
+  .level-btn.active{border-color:var(--accent);color:var(--accent);background:#eef4fb;}
+  /* common training */
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:14px;}
+  .m-desc{color:var(--sub);font-size:14px;line-height:1.6;max-width:340px;}
+  .progress{font-size:12px;color:var(--sub);text-align:center;margin-bottom:6px;}
+  .hint-line{font-size:12px;color:var(--sub);text-align:center;margin:8px 0;}
+  .grid-box{display:grid;gap:6px;margin:10px auto;width:100%;max-width:360px;}
+  .cell{border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;font-weight:800;aspect-ratio:1/1;user-select:none;font-size:18px;cursor:pointer;}
+  .cell.dim{opacity:.35;}
+  .word-show{font-size:46px;font-weight:900;text-align:center;margin:18px 0;}
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+  .opt-btn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:15px;color:var(--ink);}
+  .opt-btn:active{background:#eef4fb;}
+  .opt-btn.neutral{background:#f8f9fb;border-color:var(--line);color:var(--ink);}
+  .row{display:flex;gap:10px;width:100%;max-width:360px;margin:10px auto;justify-content:center;align-items:center;}
+  .result{text-align:center;padding:20px 0;}
+  .result .score{font-size:42px;font-weight:900;color:var(--accent);}
+  .result .lab{color:var(--sub);font-size:14px;margin-top:4px;}
+  .result .time{font-size:13px;color:var(--sub);margin-top:6px;}
+  .result .grade{font-size:15px;font-weight:800;margin-top:8px;padding:6px 14px;border-radius:999px;display:inline-block;background:#eef4fb;color:var(--accent);}
+  .result .interpret{font-size:12px;color:var(--sub);margin:10px auto 0;max-width:320px;line-height:1.5;}
+  .dual{display:flex;gap:10px;justify-content:center;align-items:flex-start;}
+  .dual .side{flex:1;max-width:170px;}
+  .side .cap{font-size:11px;color:var(--sub);text-align:center;margin-bottom:4px;}
+  .mirror-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+  .study-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:340px;margin:14px auto;}
+  .pair{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow);}
+  .pair .obj{font-size:30px;}
+  .pair .sc{font-size:26px;}
+  .pair .arrow{color:var(--sub);font-size:12px;margin:2px 0;}
+  .item-card{font-size:48px;background:var(--card);border-radius:16px;padding:24px 30px;box-shadow:var(--shadow);margin:10px auto;}
+  .item-info{font-size:12px;color:var(--sub);margin-top:4px;}
+  .price-tag{font-size:18px;font-weight:800;color:var(--warn);margin-top:6px;}
+  .cat-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0;}
+  .cat-btn{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px;}
+  .cat-btn:active{background:#eef4fb;}
+  .cat-btn.selected{border-color:var(--accent);background:#eef4fb;color:var(--accent);}
+  .txt-input{width:100%;max-width:340px;border:1.5px solid var(--line);border-radius:12px;padding:14px;font-size:16px;font-family:inherit;}
+  .poem-ref{font-size:13px;color:var(--sub);background:#f6f8fb;border-radius:8px;padding:10px;margin:10px auto;max-width:360px;line-height:1.5;text-align:center;}
+  .story-box{font-size:14px;line-height:1.8;background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow);max-width:360px;margin:10px auto;text-align:left;}
+  .story-box .hl{background:#fff4c2;padding:0 2px;border-radius:2px;}
+  .pattern-board{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:14px auto;}
+  .pattern-pair{display:flex;gap:10px;justify-content:center;align-items:flex-start;}
+  .pattern-col{flex:1;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px;text-align:center;}
+  .pattern-col .cap{font-size:11px;color:var(--sub);margin-bottom:6px;}
+  .pattern-col svg{width:100%;height:auto;display:block;}
+  .pattern-col.mirror svg{transform:scaleX(-1);}
+  .pattern-shape{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round;stroke-linecap:round;}
+  .pattern-guide{fill:none;stroke:#d0d8e8;stroke-width:1.5;stroke-dasharray:4 3;}
+  .voice-btn{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px;}
+  .voice-btn.rec{background:#ffeded;border-color:var(--bad);color:var(--bad);}
+  .countdown{font-size:13px;color:var(--warn);text-align:center;}
+  .reward-bar{text-align:center;margin:18px 0 8px;}
+  .reward-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--accent);border:1.5px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:var(--shadow);}
+  .reward-btn:active{transform:scale(.97);}
+  .reward-modal{position:fixed;inset:0;background:rgba(30,40,60,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;}
+  .reward-modal.show{display:flex;}
+  .reward-card{background:#fff;border-radius:20px;padding:22px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.2);}
+  .reward-card img{width:100%;border-radius:12px;}
+  .reward-card h3{margin:0 0 8px;font-size:18px;}
+  .reward-card p{font-size:13px;color:var(--sub);margin:8px 0 16px;}
+  .reward-close{margin-top:14px;width:100%;background:#eef4fb;color:var(--accent);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="dot">🧠</span><span>每天十分钟 · 去脑雾</span></div>
+    <div class="date" id="dateLabel"></div>
+  </header>
+
+  <section class="hero">
+    <div class="tag">DAILY BRAIN TRAINING</div>
+    <h1>每天十分钟，告别脑雾</h1>
+    <div class="desc">七项认知训练，每天内容刷新。坚持，让大脑更清醒。</div>
+    <div class="today-card" id="todayCard"></div>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="sec-title">今日 7 项 · 每天刷新</div>
+  <div class="grid" id="hall"></div>
+
+  <div class="sec-title">想多练几遍？自由练习</div>
+  <div class="grid" id="practice"></div>
+
+  <div class="reward-bar"><button class="reward-btn" id="rewardBtn">☕ 打赏支持</button></div>
+  <footer>
+    认知训练工具，非医疗诊断。坚持每天十分钟，慢慢来。<br>
+    <a href="#" id="resetLink">重置我的数据</a>
+  </footer>
+</div>
+
+<div class="reward-modal" id="rewardModal">
+  <div class="reward-card">
+    <h3>☕ 请我喝杯咖啡</h3>
+    <p>如果这个工具帮到了你，欢迎扫码打赏支持我继续迭代。</p>
+    <img src="images/reward.png" alt="微信支付">
+    <button class="reward-close" id="rewardClose">关闭</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-head">
+    <button class="back" id="ovBack">← 退出</button>
+    <span class="ttl" id="ovTitle"></span>
+    <span class="timer" id="ovTimer">00:00.0</span>
+  </div>
+  <div class="ov-body" id="ovBody"></div>
+</div>
+
+<script>
+"use strict";
+/* ---------- utils ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const pad=n=>n<10?'0'+n:''+n;
+const dateStr=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const rnd=n=>Math.floor(Math.random()*n);
+function shuffleRng(a,rng){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rngFor(moduleId,daily){return mulberry32(daily?hashStr(todayStr()+'|'+moduleId):(Date.now()>>>0));}
+
+/* ---------- storage ---------- */
+const KEY='naowu_v2';
+let store=JSON.parse(localStorage.getItem(KEY)||'{}');
+function save(){localStorage.setItem(KEY,JSON.stringify(store));}
+
+/* ---------- date/progress ---------- */
+function todayStr(){return dateStr(new Date());}
+function todayDoneMap(){const t=todayStr();return (store.done&&store.done[t])||{};}
+function todayDoneCount(){return Object.keys(todayDoneMap()).length;}
+function isModuleDoneToday(id){return !!todayDoneMap()[id];}
+function todayTotalTime(){const m=todayDoneMap();let s=0;Object.values(m).forEach(v=>{s+=((typeof v==='object'?v.time:0)||0);});return s;}
+function streak(){
+  let s=0;const d=new Date();
+  while(true){const k=dateStr(d);const m=store.done&&store.done[k];const cnt=m?Object.keys(m).length:0;
+    if(cnt>=MODULES.length){s++;d.setDate(d.getDate()-1);}else break;}
+  return s;
+}
+function todayOrder(){return ['schulte','stroop','seqwm','auditory','mirror','classify','scenario'];}
+
+/* ---------- audio ---------- */
+let actx=null;
+function ensureAudio(){if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){actx=null;}}if(actx&&actx.state==='suspended')actx.resume();return actx;}
+function playTone(freq,startT,dur,vol=0.2){
+  const c=ensureAudio();if(!c)return;
+  const o=c.createOscillator(),g=c.createGain();
+  o.frequency.value=freq;o.type='sine';
+  g.gain.setValueAtTime(0,startT);
+  g.gain.linearRampToValueAtTime(vol,startT+0.02);
+  g.gain.linearRampToValueAtTime(0.0001,startT+dur);
+  o.connect(g);g.connect(c.destination);
+  o.start(startT);o.stop(startT+dur+0.03);
+}
+
+/* ---------- overlay / timer ---------- */
+const overlay=$('#overlay'),ovTitle=$('#ovTitle'),ovBody=$('#ovBody'),ovTimer=$('#ovTimer');
+let currentTimer=null;
+function openOverlay(){overlay.classList.add('show');}
+function closeOverlay(){overlay.classList.remove('show');ovBody.innerHTML='';if(currentTimer){currentTimer.stop();currentTimer=null;}ovTimer.textContent='00:00.0';}
+$('#ovBack').onclick=()=>closeOverlay();
+
+function Timer(el){this.el=el;this.startTime=0;this.running=false;this.rid=null;this.lastElapsed=0;}
+Timer.prototype.start=function(){this.running=true;this.startTime=performance.now();this.update();};
+Timer.prototype.stop=function(){if(this.running){this.lastElapsed=(performance.now()-this.startTime)/1000;this.running=false;}cancelAnimationFrame(this.rid);};
+Timer.prototype.update=function(){if(!this.running)return;const ms=performance.now()-this.startTime;const s=Math.floor(ms/1000);const m=Math.floor(s/60);this.el.textContent=pad(m)+':'+pad(s%60)+'.'+Math.floor((ms%1000)/100);this.rid=requestAnimationFrame(this.update.bind(this));};
+Timer.prototype.elapsed=function(){return this.running?(performance.now()-this.startTime)/1000:this.lastElapsed;};
+
+function showResult(res,onAgain,onDone){
+  ovBody.innerHTML=`<div class="result">
+    <div class="score">${res.label}</div>
+    <div class="lab">${res.sub||''}</div>
+    ${res.time?('<div class="time">⏱ 用时 '+res.time.toFixed(1)+' 秒</div>'):''}
+    ${res.grade?'<div class="grade">'+res.grade+'</div>':''}
+    ${res.interpret?'<div class="interpret">'+res.interpret+'</div>':''}
+    ${res.isBest?'<div class="best-flag">🎉 本难度新纪录</div>':''}
+    <div class="row" style="margin-top:20px">
+      <button class="btn" id="again" style="background:#eef4fb;color:var(--accent);flex:1">再来一次</button>
+      <button class="btn btn-accent" id="finish" style="flex:1">完成</button>
+    </div>
+  </div>`;
+  $('#again',ovBody).onclick=onAgain;
+  $('#finish',ovBody).onclick=onDone;
+}
+
+/* ---------- module 1: 舒尔特表 ---------- */
+const POEM="晨起迎朝阳读书破万卷笔耕不辍久脑清心更亮日日有新知";
+const PALETTE=['#e74c3c','#3498db','#27ae60','#f1c40f','#9b59b6','#e67e22','#1abc9c','#34495e'];
+function schulteGrade(seconds,age){
+  if(age==null)return null;
+  let r;
+  if(age>=18)r=[[20,'优秀'],[25,'良好'],[30,'中等']];
+  else if(age>=12)r=[[16,'优秀'],[18,'良好'],[23,'中等']];
+  else if(age>=7)r=[[26,'优秀'],[32,'良好'],[40,'中等']];
+  else r=[[60,'优秀'],[90,'良好'],[120,'中等']];
+  for(const [t,g] of r){if(seconds<t)return g;}
+  return '需提升';
+}
+function startSchulte(body,done,level,timer){
+  const {grid,order,type,multicolor}=level.params;
+  const total=grid*grid;
+  let labels=[];
+  if(type==='poem'){labels=POEM.split('').slice(0,total);}
+  else if(type==='letter'){for(let i=0;i<total;i++)labels.push(String.fromCharCode(65+i));}
+  else{for(let i=1;i<=total;i++)labels.push(''+i);}
+  if(order==='desc')labels.reverse();
+  const seq=[...labels];
+  const rng=rngFor('schulte',false);
+  const display=shuffleRng(seq,rng);
+  body.innerHTML=`<div class="progress">按${order==='desc'?'降序':'升序'}点击：${seq.join(' → ')}</div>
+    ${type==='poem'?'<div class="poem-ref">参考：'+POEM+'</div>':''}
+    <div class="grid-box" id="g" style="grid-template-columns:repeat(${grid},1fr);max-width:${grid*58+12}px"></div>`;
+  const g=$('#g',body);
+  const cells=[];
+  display.forEach((v,i)=>{const c=document.createElement('div');c.className='cell';c.textContent=v;c.dataset.v=v;
+    if(multicolor)c.style.color=PALETTE[Math.floor(rng()*PALETTE.length)];
+    g.appendChild(c);cells.push(c);});
+  let nextIdx=0;
+  timer.start();
+  cells.forEach(c=>c.addEventListener('click',()=>{
+    if(c.dataset.v===seq[nextIdx]){c.classList.add('dim');c.style.pointerEvents='none';nextIdx++;
+      if(nextIdx>=seq.length){timer.stop();const t=timer.elapsed();done({value:+t.toFixed(1),label:t.toFixed(1)+' 秒',dir:'min',time:t});}}
+  }));
+}
+function schulteResult(res){
+  let age=store.age;
+  if(age==null){
+    const ageIn=prompt('首次使用舒尔特表，请输入你的年龄（用于参考评级）：');
+    age=parseInt(ageIn,10);if(!isNaN(age)&&age>0&&age<100){store.age=age;save();}else age=null;
+  }
+  const g=age!=null?schulteGrade(res.value,age):null;
+  return {label:res.label,sub:'舒尔特表 5×5 参考',time:res.time,grade:g||'—',interpret:g?'参考：飞行员约 8 秒；你当前为 '+g+'。坚持训练，反应速度和注意力都会提升。':'参考：飞行员约 8 秒。可在设置页填写年龄以获取同龄评级。'};
+}
+
+/* ---------- module 2: Stroop ---------- */
+const STROOP_COLORS=[{n:'红',c:'#e74c3c'},{n:'蓝',c:'#3498db'},{n:'绿',c:'#27ae60'},{n:'黄',c:'#f1c40f'},{n:'紫',c:'#9b59b6'},{n:'橙',c:'#e67e22'}];
+function startStroop(body,done,level,timer){
+  const {colors,trials,timeLimit}=level.params;
+  const pool=STROOP_COLORS.slice(0,colors);
+  const rng=rngFor('stroop',false);
+  const seq=[];for(let i=0;i<trials;i++)seq.push({word:Math.floor(rng()*colors),ink:Math.floor(rng()*colors)});
+  let i=0,correct=0;const times=[];let trialStart=0,timeoutId=null;
+  function render(){
+    if(i>=seq.length){if(timeoutId)clearTimeout(timeoutId);timer.stop();const t=timer.elapsed();const avg=times.length?((times.reduce((a,b)=>a+b,0)/times.length)/1000).toFixed(2):'0.00';done({value:correct,label:correct+'/'+trials+' 正确',dir:'max',time:t,sub:'平均反应 '+avg+' 秒'});return;}
+    const t=seq[i];
+    body.innerHTML=`<div class="progress">第 ${i+1} / ${trials} 题</div>
+      <div class="word-show" style="color:${pool[t.ink].c}">${pool[t.word].n}</div>
+      <div class="m-desc">点击<b>字体颜色</b>对应的字义（不是字本身）</div>
+      <div class="opt-row" id="opts"></div>`;
+    const opts=$('#opts',body);
+    pool.forEach((col,idx)=>{const b=document.createElement('button');b.className='opt-btn neutral';b.textContent=col.n;b.onclick=()=>answer(idx);opts.appendChild(b);});
+    trialStart=performance.now();
+    if(timeLimit){timeoutId=setTimeout(()=>answer(-1),timeLimit);}
+  }
+  function answer(idx){
+    if(timeoutId){clearTimeout(timeoutId);timeoutId=null;}
+    if(idx===seq[i].ink){correct++;times.push(performance.now()-trialStart);}
+    i++;render();
+  }
+  timer.start();
+  render();
+}
+
+/* ---------- module 3: 序列工作记忆 ---------- */
+const WM_CATS={
+  '水果':['苹果','香蕉','葡萄','橙子'],
+  '文具':['铅笔','笔记本','剪刀','尺子'],
+  '动物':['狗','猫','鸟','鱼'],
+  '日用品':['肥皂','牙刷','洗发水','纸巾']
+};
+const WM_EMOJI={'苹果':'🍎','香蕉':'🍌','葡萄':'🍇','橙子':'🍊','铅笔':'✏️','笔记本':'📒','剪刀':'✂️','尺子':'📏','狗':'🐶','猫':'🐱','鸟':'🐦','鱼':'🐟','肥皂':'🧼','牙刷':'🪥','洗发水':'🧴','纸巾':'🧻'};
+function startSeqWM(body,done,level,timer){
+  const {items,count,interval}=level.params;
+  const cats=Object.keys(WM_CATS).slice(0,count);
+  const allItems=[];cats.forEach(cat=>WM_CATS[cat].forEach(name=>allItems.push({cat,name})));
+  const rng=rngFor('seqwm',false);
+  const seq=shuffleRng(allItems,rng).slice(0,items);
+  body.innerHTML=`<div class="center"><div class="big-emoji">👀</div><div class="m-desc">接下来依次出现 ${items} 个物品。<br>只显示图像，不显示名称。<br>记住每个物品<b>是什么</b>以及它们的<b>出现顺序</b>。</div><button class="btn btn-accent" id="go" style="max-width:240px">开始展示</button></div>`;
+  $('#go',body).onclick=()=>{
+    timer.start();
+    let idx=0;
+    function showOne(){
+      if(idx>=seq.length){askInput();return;}
+      const it=seq[idx];
+      body.innerHTML=`<div class="center"><div class="item-card">${WM_EMOJI[it.name]}</div><div class="countdown">${Math.ceil(interval/1000)}</div></div>`;
+      let sec=Math.ceil(interval/1000);
+      const cd=$('.countdown',body);
+      const iv=setInterval(()=>{sec--;if(sec<=0){clearInterval(iv);idx++;showOne();}else cd.textContent=sec;},1000);
+    }
+    showOne();
+  };
+  function askInput(){
+    const names=Object.values(WM_CATS).flat().slice(0,count*4);
+    body.innerHTML=`<div class="center">
+      <div class="m-desc">按顺序输入你看到的物品的<b>名称</b>，用空格隔开。<br>物品名称包括：${names.join('、')}</div>
+      <input class="txt-input" id="ans" placeholder="例如：${names.slice(0,3).join(' ')}" autocomplete="off">
+      <button class="btn btn-accent" id="sub" style="max-width:240px">提交</button>
+    </div>`;
+    const input=$('#ans',body);
+    input.focus();
+    $('#sub',body).onclick=()=>{
+      timer.stop();
+      const parts=input.value.trim().split(/\s+/);
+      const actual=seq.map(s=>s.name);
+      let correct=0;
+      for(let i=0;i<Math.min(parts.length,actual.length);i++)if(parts[i]===actual[i])correct++;
+      const t=timer.elapsed();
+      done({value:correct,label:correct+'/'+items+' 正确',dir:'max',time:t,sub:'顺序：'+actual.join(' → ')});
+    };
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#sub',body).click();});
+  }
+}
+
+/* ---------- module 4: 听觉选择性注意 ---------- */
+const AUD_WORDS=['猫','狗','书','桌','花','水','山','云','路','家','灯','门','风','雨','车'];
+function startAuditory(body,done,level,timer){
+  const {count,interval,ratio,complexity,type}=level.params;
+  const rng=rngFor('auditory',false);
+  const seq=[];
+  if(type==='digits'){for(let i=0;i<count;i++)seq.push(String(Math.floor(rng()*10)));}
+  else{for(let i=0;i<count;i++)seq.push(AUD_WORDS[Math.floor(rng()*AUD_WORDS.length)]);}
+  body.innerHTML=`<div class="center"><div class="big-emoji">👂</div><div class="m-desc">点击播放后，你会听到一段音频。<br>信息音会混在背景音中，请仔细听。<br>结束后按顺序写下你听到的<b>${type==='digits'?'数字':'词语'}</b>。</div><button class="btn btn-accent" id="play" style="max-width:240px">播放音频</button><div class="countdown" id="cd"></div></div>`;
+  $('#play',body).onclick=()=>{
+    const c=ensureAudio();if(!c){$('#cd',body).textContent='当前环境不支持音频';return;}
+    $('#play',body).disabled=true;$('#cd',body).textContent='播放中…';
+    const totalDur=count*interval+1000;
+    // background
+    const bgGain=c.createGain();bgGain.connect(c.destination);
+    const bgVol=1/(1+ratio/100);
+    bgGain.gain.setValueAtTime(bgVol,c.currentTime);
+    bgGain.gain.setValueAtTime(0,c.currentTime+totalDur/1000);
+    if(complexity===0){
+      const o=c.createOscillator();o.type='sine';o.frequency.value=180;o.connect(bgGain);o.start(c.currentTime);o.stop(c.currentTime+totalDur/1000);
+    }else if(complexity===1){
+      [200,330,470].forEach((f,k)=>{const o=c.createOscillator();o.type=k%2?'square':'sine';o.frequency.value=f;const g=c.createGain();g.gain.value=0.25;o.connect(g);g.connect(bgGain);o.start(c.currentTime);o.stop(c.currentTime+totalDur/1000);});
+    }else{
+      const bufSize=2*c.sampleRate;const buf=c.createBuffer(1,bufSize,c.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<bufSize;i++)d[i]=Math.random()*2-1;
+      const src=c.createBufferSource();src.buffer=buf;src.loop=true;const g=c.createGain();g.gain.value=0.18;src.connect(g);g.connect(bgGain);src.start(c.currentTime);src.stop(c.currentTime+totalDur/1000);
+      [150,300].forEach(f=>{const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;const g2=c.createGain();g2.gain.value=0.06;o.connect(g2);g2.connect(bgGain);o.start(c.currentTime);o.stop(c.currentTime+totalDur/1000);});
+    }
+    // spoken items
+    const voices=window.speechSynthesis?window.speechSynthesis.getVoices():[];
+    const zh=voices.find(v=>v.lang.startsWith('zh'))||null;
+    seq.forEach((txt,i)=>{
+      setTimeout(()=>{
+        const u=new SpeechSynthesisUtterance(txt);
+        u.lang='zh-CN';u.rate=1;if(zh)u.voice=zh;u.pitch=1;
+        window.speechSynthesis.speak(u);
+      },i*interval+300);
+    });
+    setTimeout(()=>{askInput(seq);},totalDur);
+  };
+  function askInput(seq){
+    timer.start();
+    const isDigit=level.params.type==='digits';
+    body.innerHTML=`<div class="center">
+      <div class="m-desc">按顺序输入你听到的${isDigit?'数字':'词语'}，用空格隔开。</div>
+      <input class="txt-input" id="ans" placeholder="例如：${isDigit?'3 7 1 9':'猫 书 山'}" autocomplete="off">
+      <button class="btn btn-accent" id="sub" style="max-width:240px">提交</button>
+    </div>`;
+    const input=$('#ans',body);input.focus();
+    $('#sub',body).onclick=()=>{
+      timer.stop();
+      const parts=input.value.trim().split(/\s+/);
+      let correct=0;
+      for(let i=0;i<Math.min(parts.length,seq.length);i++)if(parts[i]===seq[i])correct++;
+      const t=timer.elapsed();
+      done({value:correct,label:correct+'/'+seq.length+' 正确',dir:'max',time:t,sub:'正确序列：'+seq.join(' ')});
+    };
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#sub',body).click();});
+  }
+}
+
+/* ---------- module 5: 双侧镜像协调 ---------- */
+function startMirror(body,done,level,timer){
+  const {count,eyesClosed,targetTime}=level.params;
+  const paths={
+    circle:'<circle cx="50" cy="50" r="32" class="pattern-shape"/>',
+    triangle:'<polygon points="50,18 82,78 18,78" class="pattern-shape"/>',
+    square:'<rect x="20" y="20" width="60" height="60" rx="4" class="pattern-shape"/>',
+    star:'<polygon points="50,12 58,38 86,38 64,56 72,84 50,68 28,84 36,56 14,38 42,38" class="pattern-shape"/>',
+    zigzag:'<polyline points="12,72 30,28 50,72 70,28 88,72" class="pattern-shape"/>',
+    flower:'<g class="pattern-shape"><circle cx="50" cy="32" r="12"/><circle cx="32" cy="50" r="12"/><circle cx="68" cy="50" r="12"/><circle cx="40" cy="68" r="12"/><circle cx="60" cy="68" r="12"/></g>',
+    diamond:'<polygon points="50,12 82,50 50,88 18,50" class="pattern-shape"/>',
+    heart:'<path d="M50,78 C50,78 16,54 16,34 C16,20 28,10 42,18 L50,26 L58,18 C72,10 84,20 84,34 C84,54 50,78 50,78 Z" class="pattern-shape"/>'
+  };
+  const shapeKeys=Object.keys(paths);
+  const rng=rngFor('mirror',true);
+  const chosen=shuffleRng(shapeKeys,rng).slice(0,count);
+  const svg=shape=>`<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><line x1="0" y1="50" x2="100" y2="50" class="pattern-guide"/><line x1="50" y1="10" x2="50" y2="90" class="pattern-guide"/>${paths[shape]||paths.circle}</svg>`;
+  const pair=shape=>`<div class="pattern-pair"><div class="pattern-col"><div class="cap">左手</div>${svg(shape)}</div><div class="pattern-col mirror"><div class="cap">右手镜像</div>${svg(shape)}</div></div>`;
+  const board=chosen.map(pair).join('');
+  body.innerHTML=`<div class="center" style="min-height:8vh">
+    <div class="big-emoji">✍️</div>
+    <div class="m-desc">准备两支笔，左右手各一支。<br>左手照左图、右手照右图（镜像），<b>同时</b>在纸上描出每个图形。<br>${eyesClosed?'本关闭眼画（凭感觉描）。':'本关睁眼画。'}<br>全部描完后点「我已完成」。</div>
+  </div>
+  <div class="pattern-board">${board}</div>
+  <div class="row"><button class="btn btn-accent" id="done" style="max-width:280px">我已完成</button></div>
+  ${targetTime?('<div class="hint-line">目标：'+targetTime+' 秒内完成</div>'):''}`;
+  timer.start();
+  $('#done',body).onclick=()=>{
+    timer.stop();const t=timer.elapsed();
+    const ok=t>=1;
+    done({value:+t.toFixed(1),label:ok?t.toFixed(1)+' 秒':'时间过短',dir:'min',time:t,sub:ok?('完成 '+count+' 个镜像图形'):'请认真描完再提交'});
+  };
+}
+
+/* ---------- module 6: 规则分类逻辑 ---------- */
+const CL_CATS={
+  '食品':[{n:'苹果',p:3.5},{n:'面包',p:8},{n:'牛奶',p:6},{n:'香蕉',p:4}],
+  '文具':[{n:'铅笔',p:2},{n:'笔记本',p:12},{n:'剪刀',p:9},{n:'尺子',p:3}],
+  '日用品':[{n:'肥皂',p:5},{n:'牙刷',p:7},{n:'洗发水',p:28},{n:'纸巾',p:15}]
+};
+const CL_EMOJI={'苹果':'🍎','面包':'🍞','牛奶':'🥛','香蕉':'🍌','铅笔':'✏️','笔记本':'📒','剪刀':'✂️','尺子':'📏','肥皂':'🧼','牙刷':'🪥','洗发水':'🧴','纸巾':'🧻'};
+function startClassify(body,done,level,timer){
+  let {trials,threshold,timeLimit}=level.params;
+  const cats=Object.keys(CL_CATS);
+  const rng=rngFor('classify',false);
+  const pool=[];
+  cats.forEach(cat=>CL_CATS[cat].forEach(it=>pool.push({cat,name:it.n,base:it.p})));
+  const shuffled=shuffleRng(pool,rng).slice(0,Math.min(trials,pool.length));
+  const seq=shuffled.map(it=>({cat:it.cat,name:it.name,price:it.base+Math.floor(rng()*5)-2}));
+  trials=seq.length;
+  let i=0,correct=0,catSel=null,priceSel=null,timeoutId=null;
+  const needPrice=threshold>0;
+  timer.start();
+  function next(){
+    if(timeoutId){clearInterval(timeoutId);timeoutId=null;}
+    if(i>=seq.length){timer.stop();const t=timer.elapsed();done({value:correct,label:correct+'/'+trials+' 正确',dir:'max',time:t});return;}
+    const it=seq[i];catSel=null;priceSel=null;
+    body.innerHTML=`<div class="progress">第 ${i+1} / ${trials} 题</div>
+      <div class="center" style="min-height:30vh"><div class="item-card">${CL_EMOJI[it.name]}</div>${needPrice?'<div class="price-tag">¥'+it.price+'</div>':''}</div>
+      <div class="m-desc">${(needPrice?'规则：> ¥'+threshold+' 为高价，≤ ¥'+threshold+' 为低价。请选类别并选价格。':'请判断物品类别。')+' 选完自动进入下一题。'}</div>
+      <div class="cat-btns" id="cats"></div>
+      ${needPrice?'<div class="cat-btns" id="prices"></div>':''}`;
+    const catsEl=$('#cats',body),pricesEl=needPrice?$('#prices',body):null;
+    function refresh(){
+      [...catsEl.children].forEach(b=>b.classList.toggle('selected',b.textContent===catSel));
+      if(needPrice)[...pricesEl.children].forEach(b=>b.classList.toggle('selected',b.textContent===priceSel));
+      if(catSel&&(!needPrice||priceSel))setTimeout(advance,350);
+    }
+    function advance(){
+      if(advanced)return;advanced=true;
+      if(timeoutId){clearInterval(timeoutId);timeoutId=null;}
+      const rightCat=catSel===it.cat;const rightPrice=needPrice?((priceSel==='高价')===(it.price>threshold)):true;
+      if(rightCat&&rightPrice)correct++;i++;next();
+    }
+    let advanced=false;
+    cats.forEach(c=>{const b=document.createElement('button');b.className='cat-btn';b.textContent=c;b.onclick=()=>{catSel=c;refresh();};catsEl.appendChild(b);});
+    if(needPrice){
+      ['高价','低价'].forEach(p=>{const b=document.createElement('button');b.className='cat-btn';b.textContent=p;b.onclick=()=>{priceSel=p;refresh();};pricesEl.appendChild(b);});
+    }
+    if(timeLimit){
+      let left=timeLimit;const cd=document.createElement('div');cd.className='countdown';cd.textContent=(left/1000).toFixed(1)+'s';body.insertBefore(cd,body.firstChild);
+      timeoutId=setInterval(()=>{left-=100;if(left<=0){clearInterval(timeoutId);timeoutId=null;advance();}else cd.textContent=(left/1000).toFixed(1)+'s';},100);
+    }
+  }
+  next();
+}
+
+/* ---------- module 7: 情景联想记忆 ---------- */
+const STORY_ITEMS=['苹果','钥匙','书','气球','咖啡','雨伞','耳机','手表','相机','蛋糕'];
+const STORY_EMOJI={'苹果':'🍎','钥匙':'🔑','书':'📚','气球':'🎈','咖啡':'☕','雨伞':'☂️','耳机':'🎧','手表':'⌚','相机':'📷','蛋糕':'🍰'};
+function startScenario(body,done,level,timer){
+  const {count,weakAssoc}=level.params;
+  const rng=rngFor('scenario',false);
+  const items=shuffleRng(STORY_ITEMS,rng).slice(0,count);
+  const itemGrid=items.map(it=>`<div class="pair"><div class="obj">${STORY_EMOJI[it]}</div></div>`).join('');
+  const hint=weakAssoc?'这些物品关联性较弱，挑战你用创意把它们串起来。':'这些物品关联性较强，试着编一个连贯小故事。';
+  body.innerHTML=`<div class="center"><div class="big-emoji">🎬</div><div class="m-desc">请记住以下 ${count} 个物品，并围绕它们<b>自己构建</b>一个场景故事。<br>故事越具象、感官越丰富、关联越强，得分越高。</div><div class="study-grid">${itemGrid}</div><div class="m-desc" style="font-size:12px">${hint}</div><button class="btn btn-accent" id="go" style="max-width:240px">开始编故事</button></div>`;
+  $('#go',body).onclick=()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    body.innerHTML=`<div class="center">
+      <div class="m-desc">用你刚才编的故事，把上面 ${count} 个物品尽量都包含进去。<br>可以打字，也可以语音输入。</div>
+      <textarea class="txt-input" id="ans" rows="5" placeholder="例如：早晨我拿起钥匙..." style="resize:none"></textarea>
+      ${SR?'<button class="voice-btn" id="rec">🎤 按住说话</button>':''}
+      <button class="btn btn-accent" id="sub" style="max-width:240px">提交评分</button>
+    </div>`;
+    const input=$('#ans',body);
+    if(SR)setupVoice($('#rec',body),input);
+    $('#sub',body).onclick=()=>{
+      const txt=input.value;
+      const r=scoreStory(txt,items);
+      done({value:r.total,label:r.total+' 分',dir:'max',time:0,sub:`物品 ${r.found}/${items.length} · 感官/关联词 ${r.assoc} · 完整度 ${r.len}`});
+    };
+  };
+}
+function setupVoice(btn,input){
+  const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();rec.lang='zh-CN';rec.continuous=false;rec.interimResults=true;
+  let final='';
+  btn.addEventListener('pointerdown',()=>{final='';input.value='';rec.start();btn.classList.add('rec');btn.textContent='🔴 正在听…';});
+  btn.addEventListener('pointerup',()=>{rec.stop();btn.classList.remove('rec');btn.textContent='🎤 按住说话';});
+  btn.addEventListener('pointerleave',()=>{rec.stop();btn.classList.remove('rec');btn.textContent='🎤 按住说话';});
+  rec.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;input.value=final+t;};
+  rec.onerror=e=>{btn.classList.remove('rec');btn.textContent='🎤 语音识别出错';};
+}
+function scoreStory(txt,items){
+  let score=0;txt=txt||'';
+  const found=items.filter(it=>txt.includes(it)||txt.includes(STORY_EMOJI[it])).length;
+  const fScore=Math.round(found*(60/items.length));score+=fScore;
+  const assoc=['因为','所以','然后','接着','突然','这时','最后','首先','同时','一边','看见','看到','听见','听到','闻到','尝到','吃到','触到','摸到','感觉','感到','阳光','声音','气味','香味','味道','冰凉','温暖','红色','蓝色','绿色','黄色','大声','轻轻','慢慢','快速','具体','仿佛','似乎'];
+  let assocCount=0;assoc.forEach(w=>{if(txt.includes(w))assocCount++;});
+  const aScore=Math.min(25,assocCount*2);score+=aScore;
+  const lScore=Math.min(15,Math.floor(txt.length/15));score+=lScore;
+  return {total:Math.min(100,Math.max(0,score)),found,assoc:assocCount,len:lScore};
+}
+
+/* ---------- registry ---------- */
+const MODULES=[
+  {id:'schulte',name:'舒尔特表',emoji:'🔢',tag:'注意力·视觉搜索',
+   how:'按数字/字母顺序快速点击。训练眼睛在杂乱信息里迅速定位目标——就像看书时一眼找到关键词、开车时快速扫到路牌、上课时抓住黑板重点。',
+   helps:['读书提速','找东西快','开车扫视','上课抓重点'],
+   evidence:'舒尔特表是飞行员、航天员选拔的注意力测试；长期练习可提升视觉搜索速度与注意力广度。',
+   levels:[
+     {id:'easy',name:'简单',params:{grid:3,order:'asc',type:'number',multicolor:false}},
+     {id:'medium',name:'中等',params:{grid:4,order:'asc',type:'number',multicolor:true}},
+     {id:'hard',name:'困难',params:{grid:5,order:'desc',type:'poem',multicolor:true}}
+   ],
+   run:startSchulte,format:schulteResult},
+  {id:'stroop',name:'Stroop 训练',emoji:'🎨',tag:'抑制控制',
+   how:'屏幕出现带颜色的字，你要选「字体颜色」而非字义。这逼大脑抑制本能反应——正如工作中一边接电话一边处理表格，需要忽略干扰、专注当下任务，让注意力与记忆力更稳更强。',
+   helps:['多任务处理','抗干扰','专注力','反应冷静'],
+   evidence:'基于 1935 年 Stroop 颜色-词干扰效应，是认知心理学中研究选择性注意与抑制控制的经典范式。',
+   levels:[
+     {id:'easy',name:'简单',params:{colors:4,trials:15,timeLimit:0}},
+     {id:'medium',name:'中等',params:{colors:4,trials:25,timeLimit:2500}},
+     {id:'hard',name:'困难',params:{colors:6,trials:40,timeLimit:1800}}
+   ],
+   run:startStroop},
+  {id:'seqwm',name:'序列工作记忆',emoji:'🧠',tag:'工作记忆',
+   how:'依次看物品，记住「是什么」和「顺序」。就像记一串待办事项、听完口头指令马上照做，不让中间任何一步丢失。',
+   helps:['记指令','不丢步骤','临时记信息','多任务'],
+   evidence:'基于 Baddeley & Hitch 工作记忆模型；中科院脑科学研究所王立平团队关于序列记忆的神经机制研究发表于 Current Biology。',
+   levels:[
+     {id:'easy',name:'简单',params:{items:4,count:2,interval:1200}},
+     {id:'medium',name:'中等',params:{items:6,count:3,interval:900}},
+     {id:'hard',name:'困难',params:{items:9,count:4,interval:600}}
+   ],
+   run:startSeqWM},
+  {id:'auditory',name:'听觉选择性注意',emoji:'👂',tag:'听觉注意',
+   how:'在背景噪音里听清口播的数字/词并写下。就像在咖啡厅听清朋友说话、在嘈杂工位抓住关键信息、上课不漏掉老师强调的重点。',
+   helps:['嘈杂中听清','抓关键词','听课不漏','抗干扰'],
+   evidence:'基于 Cherry (1953) 双耳分听实验与现代选择性注意理论，训练在噪声中锁定目标语音的能力。',
+   levels:[
+     {id:'easy',name:'简单',params:{count:9,interval:1400,ratio:30,complexity:0,type:'digits'}},
+     {id:'medium',name:'中等',params:{count:12,interval:1000,ratio:20,complexity:1,type:'digits'}},
+     {id:'hard',name:'困难',params:{count:15,interval:700,ratio:10,complexity:2,type:'words'}}
+   ],
+   run:startAuditory},
+  {id:'mirror',name:'双侧镜像协调',emoji:'🤲',tag:'双侧协调',
+   how:'双手同时描左右镜像图形。就像双手配合系鞋带、弹琴、同时操作两个控件，练的是左右脑协同与精细动作同步。',
+   helps:['双手协调','左右脑协同','精细动作','反应同步'],
+   evidence:'基于双手协调与运动学习研究，镜像动作可促进左右脑半球与胼胝体的协同加工。',
+   levels:[
+     {id:'easy',name:'简单',params:{count:1,eyesClosed:false,targetTime:0}},
+     {id:'medium',name:'中等',params:{count:2,eyesClosed:false,targetTime:20}},
+     {id:'hard',name:'困难',params:{count:2,eyesClosed:true,targetTime:15}}
+   ],
+   run:startMirror},
+  {id:'classify',name:'规则分类逻辑',emoji:'📐',tag:'逻辑分类',
+   how:'快速判断物品类别与价格高低。就像超市理货、报销时快速归类、做决策时按规则筛选信息——看到条件即刻反应。',
+   helps:['快速归类','按规则判断','决策力','反应速度'],
+   evidence:'参考威斯康辛卡片分类测验（WCST）与类别学习研究，训练规则应用与认知灵活性。',
+   levels:[
+     {id:'easy',name:'简单',params:{trials:8,threshold:0,timeLimit:0}},
+     {id:'medium',name:'中等',params:{trials:12,threshold:10,timeLimit:3000}},
+     {id:'hard',name:'困难',params:{trials:12,threshold:15,timeLimit:2000}}
+   ],
+   run:startClassify},
+  {id:'scenario',name:'情景联想记忆',emoji:'🧩',tag:'联想记忆',
+   how:'看几个物品，自己编一个<b>具象化、强关联、加感官</b>的故事把它们串起来（评分就看这三点：画面是否具体、关联是否紧密、有没有颜色/声音/气味/触感等感官描写）。就像记购物清单或复习知识点时编口诀，记得更牢。',
+   helps:['记得更牢','编故事记忆','联想力','表达力'],
+   evidence:'基于记忆术（Method of Loci）与精细编码（Elaborative Encoding）研究，Craik & Lockhart 加工层次理论认为感官与意义加工越深，记忆越牢。',
+   levels:[
+     {id:'easy',name:'简单',params:{count:3,weakAssoc:false}},
+     {id:'medium',name:'中等',params:{count:5,weakAssoc:false}},
+     {id:'hard',name:'困难',params:{count:7,weakAssoc:true}}
+   ],
+   run:startScenario}
+];
+
+/* ---------- app flow ---------- */
+function runModule(id,daily){
+  const m=MODULES.find(x=>x.id===id);
+  ovTitle.textContent=(daily?'今日 · ':'')+m.name;
+  ovBody.innerHTML='';ovTimer.textContent='00:00.0';
+  openOverlay();
+  showIntro(m,level=>{
+    ovBody.innerHTML='';ovTimer.textContent='00:00.0';
+    const timer=new Timer(ovTimer);currentTimer=timer;
+    m.run(ovBody,res=>finishModule(id,res,daily,level,m,timer),level,timer);
+  });
+}
+function showIntro(m,onStart){
+  const levels=m.levels.map((l,i)=>`<button class="level-btn${i===1?' active':''}" data-level="${i}">${l.name}</button>`).join('');
+  ovBody.innerHTML=`<div class="intro-card">
+    <div class="big-emoji">${m.emoji}</div>
+    <h2>${m.name}</h2>
+    <div class="section"><b>怎么做</b>${m.how}</div>
+    <div class="section"><b>生活帮助</b><div class="helps">${m.helps.map(h=>`<span>${h}</span>`).join('')}</div></div>
+    <div class="section evidence"><b>依据</b>${m.evidence}</div>
+    <div class="level-select"><div class="level-title">选择难度 · 你准备好了吗？</div><div class="level-btns">${levels}</div></div>
+    <button class="btn btn-accent" id="ready" style="margin-top:6px">我准备好了</button>
+  </div>`;
+  let selected=1;
+  $('.level-btns',ovBody).onclick=e=>{
+    if(!e.target.classList.contains('level-btn'))return;
+    [...$('.level-btns',ovBody).children].forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');selected=+e.target.dataset.level;
+  };
+  $('#ready',ovBody).onclick=()=>onStart(m.levels[selected]);
+}
+function finishModule(id,res,daily,level,m,timer){
+  if(currentTimer){currentTimer.stop();currentTimer=null;}
+  // record
+  if(!store.best)store.best={};
+  const key=id+'|'+level.id;
+  const prev=store.best[key];let isBest=false;
+  if(prev===undefined){store.best[key]=res.value;isBest=true;}
+  else if(res.dir==='min'&&res.value<prev){store.best[key]=res.value;isBest=true;}
+  else if(res.dir==='max'&&res.value>prev){store.best[key]=res.value;isBest=true;}
+  if(!store.scores)store.scores={};
+  (store.scores[key]=store.scores[key]||[]).push({t:Date.now(),v:res.value,time:res.time||0});
+  if(daily){if(!store.done)store.done={};if(!store.done[todayStr()])store.done[todayStr()]={};store.done[todayStr()][id]={time:res.time||0};}
+  store.total=(store.total||0)+1;save();
+  // format result
+  let result={label:res.label,sub:res.sub||'',time:res.time||timer.elapsed(),isBest};
+  if(m.format){Object.assign(result,m.format(res));}
+  if(!result.grade)result.grade=isBest?'🎉 本难度新纪录':'再挑战一次？';
+  showResult(result,()=>runModule(id,daily),()=>{closeOverlay();renderHome();});
+}
+
+/* ---------- home render ---------- */
+function bestLabel(id,levelIdx){
+  const m=MODULES.find(x=>x.id===id);const key=id+'|'+m.levels[levelIdx].id;
+  const v=store.best&&store.best[key];if(v===undefined)return '最佳：—';
+  return m.id==='schulte'?'最佳：'+v+'s':'最佳：'+v;
+}
+function moduleCard(id,daily){
+  const m=MODULES.find(x=>x.id===id);
+  const doneToday=daily&&isModuleDoneToday(id);
+  const el=document.createElement('div');
+  el.className='card'+(doneToday?' done':'');
+  el.innerHTML=`<div class="emoji">${m.emoji}</div><div class="nm">${m.name}</div><div class="best">${bestLabel(id,1)}</div><div class="pill">${m.tag}</div>`;
+  el.onclick=()=>runModule(id,daily);
+  return el;
+}
+function renderHome(){
+  const now=new Date();
+  const wd=['日','一','二','三','四','五','六'][now.getDay()];
+  $('#dateLabel').textContent=`${now.getMonth()+1}月${now.getDate()}日 周${wd}`;
+  const doneCount=todayDoneCount();
+  const next=todayOrder().find(id=>!isModuleDoneToday(id));
+  const tc=$('#todayCard');
+  if(next){
+    tc.innerHTML=`<div class="lbl">今日进度</div><div class="name">${doneCount} / ${MODULES.length} 项已完成</div><div class="hint">每天七项，内容每日刷新不重样</div><div style="margin-top:12px"><button class="btn btn-primary" id="startToday">继续训练 →</button></div>`;
+    $('#startToday',tc).onclick=()=>runModule(next,true);
+  }else{
+    tc.innerHTML=`<div class="lbl">今日进度</div><div class="name">${MODULES.length} / ${MODULES.length} 🎉</div><div class="hint">今日七项全部完成，大脑清爽！明天见～</div>`;
+  }
+  const ttm=Math.round(todayTotalTime());
+  $('#stats').innerHTML=`<div class="stat"><div class="n">${streak()}</div><div class="t">连续打卡(天)</div></div><div class="stat"><div class="n">${Object.keys(store.done||{}).length}</div><div class="t">坚持天数</div></div><div class="stat"><div class="n">${store.total||0}</div><div class="t">累计训练</div></div><div class="stat"><div class="n">${ttm<60?ttm+'s':Math.floor(ttm/60)+':'+pad(ttm%60)}</div><div class="t">今日用时</div></div>`;
+  const hall=$('#hall');hall.innerHTML='';todayOrder().forEach(id=>hall.appendChild(moduleCard(id,true)));
+  const pr=$('#practice');pr.innerHTML='';MODULES.forEach(m=>pr.appendChild(moduleCard(m.id,false)));
+}
+$('#resetLink').onclick=(e)=>{e.preventDefault();if(confirm('确定清空所有进度与最佳成绩？')){store={};save();renderHome();}};
+$('#rewardBtn').onclick=()=>$('#rewardModal').classList.add('show');
+$('#rewardClose').onclick=()=>$('#rewardModal').classList.remove('show');
+$('#rewardModal').onclick=e=>{if(e.target===$('#rewardModal'))$('#rewardModal').classList.remove('show');};
+
+renderHome();
+</script>
+</body>
+</html>
